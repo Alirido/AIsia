@@ -48,7 +48,7 @@ class ChessBoard:
                     # print()
         print('ChessBoard object successfully created')
 
-    def _addChessPiece(self, id, colour, type)
+    def _addChessPiece(self, id, colour, type):
         """
             Adding a piece to the board
             :param id: the id of the given piece
