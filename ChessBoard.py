@@ -226,14 +226,11 @@ class ChessBoard:
         """
         row = piece['location'][0]
         col = piece['location'][1]
-        self.board[row][col]['heuristic_same'] = self.countPieceAttack(self.board, piece, piece['location'],
-                                                                       piece['colour'])
+        self.board[row][col]['heuristic_same'] = self.countPieceAttack(self.board, piece, piece['location'], piece['colour'])
         if piece['colour'] == 'BLACK':
-            self.board[row][col]['heuristic_diff'] = self.countPieceAttack(self.board, piece, piece['location'],
-                                                                           'WHITE')
+            self.board[row][col]['heuristic_diff'] = self.countPieceAttack(self.board, piece, piece['location'], 'WHITE')
         else:  # piece['colour'] == 'WHITE'
-            self.board[row][col]['heuristic_diff'] = self.countPieceAttack(self.board, piece, piece['location'],
-                                                                           'BLACK')
+            self.board[row][col]['heuristic_diff'] = self.countPieceAttack(self.board, piece, piece['location'], 'BLACK')
 
     def countPieceAttack(self, board, piece, location, colour):
         """
@@ -313,6 +310,13 @@ class ChessBoard:
                     else:  # piece['colour'] == 'BLACK'
                         count += self.countPieceAttack(self.board, piece, piece['location'], 'BLACK')
         return count
+
+    def findPieceById(self, id):
+        for row in self.board:
+            for piece in row:
+                if piece != {} and piece['id'] == id:
+                    return piece
+        return {}
 
     def printBoardInfo(self):
         """
