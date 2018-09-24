@@ -1,5 +1,6 @@
 from random import randint, seed
 from os import urandom
+from copy import deepcopy
 
 
 class ChessBoard:
@@ -185,38 +186,30 @@ class ChessBoard:
         if row - 1 >= 0:
             if (col - 2 >= 0) and (board[row - 1][col - 2] != {}) and (board[row - 1][col - 2]['colour'] == colour):
                 count += 1
-                # print(board[row-1][col-2])
             if (col + 2 < self.size) and (board[row - 1][col + 2] != {}) and (
                     board[row - 1][col + 2]['colour'] == colour):
                 count += 1
-                # print(board[row-1][col+2])
             # check first row
             if row - 2 >= 0:
                 if (col - 1 >= 0) and (board[row - 2][col - 1] != {}) and (board[row - 2][col - 1]['colour'] == colour):
                     count += 1
-                    # print(board[row-2][col-1])
                 if (col + 1 < self.size) and (board[row - 2][col - 1] != {}) and (
                         board[row - 2][col - 1]['colour'] == colour):
                     count += 1
-                    # print(board[row-2][col-1])
         # check third row
         if row + 1 < self.size:
             if (col - 2 >= 0) and (board[row + 1][col - 2] != {}) and (board[row + 1][col - 2]['colour'] == colour):
                 count += 1
-                # print(board[row+1][col-2])
             if (col + 2 < self.size) and (board[row + 1][col + 2] != {}) and (
                     board[row + 1][col + 2]['colour'] == colour):
                 count += 1
-                # print(board[row+1][col+2])
             # check fourth row
             if row + 2 < self.size:
                 if (col - 2 >= 0) and (board[row + 2][col - 2] != {}) and (board[row + 2][col - 2]['colour'] == colour):
                     count += 1
-                    # print(board[row+2][col-2])
                 if (col + 2 < self.size) and (board[row + 2][col + 2] != {}) and (
                         board[row + 2][col + 2]['colour'] == colour):
                     count += 1
-                    # print(board[row+2][col+2])
         return count
 
     def _setPieceHeuristic(self, piece):
@@ -281,8 +274,14 @@ class ChessBoard:
         self.board[piece['location'][0]][piece['location'][1]] = {}
         piece['location'] = (row, col)
         self.board[row][col] = piece
-        # print((row, col))
         self._setPieceHeuristic(piece)
+
+    def randomizeBoard(self):
+        temp_board = deepcopy(self.board)
+        for row in temp_board:
+            for piece in row:
+                if piece != {}:
+                    self.randomizePiecePosition(piece)
 
     def countSameHeuristic(self):
         """
@@ -348,6 +347,3 @@ class ChessBoard:
         attack_same = self.countSameHeuristic()
         attack_diff = self.countDiffHeuristic()
         print(attack_same, attack_diff)
-        # start-temp
-        # print('TOTAL:', attack_same + attack_diff)
-        # end-temp

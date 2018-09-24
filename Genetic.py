@@ -5,6 +5,21 @@ from os import urandom
 from ChessBoard import ChessBoard
 
 
+def GeneticAlgorithm(chessboard):
+    # generating the population
+    fitness_string_population = []
+    population_count = 10       # may be changed
+    for _ in range(population_count):
+        chessboard.randomizeBoard()
+        fitness = chessboard.countDiffHeuristic() - chessboard.countSameHeuristic()     # this is the fitness function
+        fitness_string_population.append([fitness, _ChessboardToString(chessboard.board)])
+    
+    # start of genetic algorithm iteration
+    fitness_string_population = _GeneticMutation(fitness_string_population)
+    # for i in range(len(fitness_string_population)):
+    #     fitness_string_population[i] = [fitness_string_population[i], _fitnessFunction(fitness_string_population[i], chessboard.board)]
+    # # iterative - TO BE CONTINUED
+
 def _ChessboardToString(board):
     piece_arr =[]
     for row in board:
@@ -15,31 +30,13 @@ def _ChessboardToString(board):
     piece_arr = sorted(piece_arr, key=lambda piece:piece[0])
     return ''.join([i[1] for i in piece_arr])
 
-def GeneticAlgorithm(chessboard):
-    # generating the population
-    fitness_string_population = []
-    population_count = 10       # may be changed
-    for _ in range(population_count):
-        temp_board = deepcopy(chessboard.board)
-        for row in temp_board:
-            for piece in row:
-                if piece != {}:
-                    chessboard.randomizePiecePosition(piece)
-        fitness = chessboard.countDiffHeuristic() - chessboard.countSameHeuristic()     # this is the fitness function
-        fitness_string_population.append([_ChessboardToString(chessboard.board), fitness])
-    
-    fitness_string_population = _GeneticMutation(fitness_string_population)
-    # for i in range(len(fitness_string_population)):
-    #     fitness_string_population[i] = [fitness_string_population[i], _fitnessFunction(fitness_string_population[i], chessboard.board)]
-    # # iterative - TO BE CONTINUED
-
 def _GeneticMutation(fitness_string):
     """
     the iterative steps of genetic algoritm
     """
 
     # choose the best possible mates
-    fitness_string = sorted(fitness_string, key=lambda x:x[1], reverse=True)
+    fitness_string = sorted(fitness_string, key=lambda x:x[0], reverse=True)
 
     # selecting mates
     str_couples = []
@@ -85,9 +82,6 @@ def _GeneticMutation(fitness_string):
     # return the modified strings
     return string_result
 
-# def _fitnessFunction(string, board):
-#     for id in range(board.cou)
-
 def _isStringUnique(string):
     str_arr = [string[i:i+2] for i in range(0, len(string), 2)]
     i = 0
@@ -99,6 +93,9 @@ def _isStringUnique(string):
             j += 1
         i += 1
     return True 
+
+# def _fitnessFunction(string, board):
+#     for id in range(board.cou)
 
 if __name__ == '__main__':
     chess = ChessBoard('input.txt')
