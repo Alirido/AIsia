@@ -7,6 +7,7 @@ from ChessBoard import ChessBoard
 
 def GeneticAlgorithm(chessboard):
     # generating the population
+    init_chessboard = deepcopy(chessboard)
     fitness_string_population = []
     population_count = 10       # may be changed
     for _ in range(population_count):
@@ -16,8 +17,8 @@ def GeneticAlgorithm(chessboard):
     
     # start of genetic algorithm iteration
     fitness_string_population = _GeneticMutation(fitness_string_population)
-    # for i in range(len(fitness_string_population)):
-    #     fitness_string_population[i] = [fitness_string_population[i], _fitnessFunction(fitness_string_population[i], chessboard.board)]
+    for i in range(len(fitness_string_population)):
+        fitness_string_population[i] = [fitness_string_population[i], _fitnessFunction(fitness_string_population[i], deepcopy(init_chessboard))]
     # # iterative - TO BE CONTINUED
 
 def _ChessboardToString(board):
@@ -94,8 +95,19 @@ def _isStringUnique(string):
         i += 1
     return True 
 
-# def _fitnessFunction(string, board):
-#     for id in range(board.cou)
+def _fitnessFunction(string, chessboard):
+    board_result = [[{} for _ in range(8)] for _ in range(8)]
+    for id in range(chessboard.count_black_pieces + chessboard.count_white_pieces):
+        piece = chessboard.board[id//8][id%8]
+        row = int(string[id*2])
+        col = int(string[id*2+1])
+        piece['location'] = (row,col)
+        board_result[row][col] = piece
+    chessboard.board=board_result
+    #print(string)
+    #chessboard.printBoardInfo()
+    fitness = chessboard.countDiffHeuristic() - chessboard.countSameHeuristic()
+    return fitness
 
 if __name__ == '__main__':
     chess = ChessBoard('input.txt')
