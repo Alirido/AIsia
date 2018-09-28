@@ -45,8 +45,6 @@ class ChessBoard:
             for piece in row:
                 if piece != {}:
                     self._setPieceHeuristic(piece)
-                    # print(piece)
-                    # print()
         print('ChessBoard object successfully created')
 
     def _addChessPiece(self, id, colour, type):
@@ -225,6 +223,16 @@ class ChessBoard:
         else:  # piece['colour'] == 'WHITE'
             self.board[row][col]['heuristic_diff'] = self.countPieceAttack(self.board, piece, piece['location'], 'BLACK')
 
+    def _updateAllHeuristics(self):
+        """
+            Update all heuristics (same and different colous) of all pieces
+            <<< use only when the board have reached desired state to minimize usage >>>
+        """
+        for row in self.board:
+            for piece in row:
+                if piece != {}:
+                    self._setPieceHeuristic(piece)
+    
     def isSameColour(self):
         """
         To check if chessboard play with white or black colour only
@@ -270,6 +278,7 @@ class ChessBoard:
 
     def newTemporaryBoard(self, board, piece, new_location):
         """
+            <<< NO LONGER UPDATED. MOVE TO movePiece(self, piece, new_location) >>>
             :param board: the old chessboard
             :param piece: the piece that will be moved
             :param new_location: the location of piece that will be located
@@ -280,7 +289,13 @@ class ChessBoard:
         board[new_location[0]][new_location[1]] = piece
         return board
 
-    def randomizePiecePosition(self, piece):
+    def movePiece(self, piece, new_location):
+        self.board[new_location[0]][new_location[1]] = piece                        # move piece
+        self.board[new_location[0]][new_location[1]]['location'] = new_location     # update piece location
+        self.board[piece['location'][0]][piece['location'][1]] = {}                 # delete piece in previous location
+        self._updateAllHeuristics()
+
+    def _randomizePiecePosition(self, piece):
         """
         :param piece: the piece whose location will be randomized
         :return:
@@ -296,15 +311,17 @@ class ChessBoard:
         self.board[piece['location'][0]][piece['location'][1]] = {}
         piece['location'] = (row, col)
         self.board[row][col] = piece
-        self._setPieceHeuristic(piece)
 
     def randomizeBoard(self):
         temp_board = deepcopy(self.board)
+        # place pieces in a new, random position
         for row in temp_board:
             for piece in row:
                 if piece != {}:
-                    self.randomizePiecePosition(piece)
-
+                    self._randomizePiecePosition(piece)
+        # calculate new heuristic of each 
+        self._updateAllHeuristics()
+        
     def countSameHeuristic(self):
         """
             Counting the heuristic of attacking the same colour of the board
@@ -314,7 +331,7 @@ class ChessBoard:
         for row in self.board:
             for piece in row:
                 if piece != {}:
-                    count += self.countPieceAttack(self.board, piece, piece['location'], piece['colour'])
+                    count += piece['heuristic_same']
         return count
 
     def countDiffHeuristic(self):
@@ -326,10 +343,7 @@ class ChessBoard:
         for row in self.board:
             for piece in row:
                 if piece != {}:
-                    if piece['colour'] == 'BLACK':
-                        count += self.countPieceAttack(self.board, piece, piece['location'], 'WHITE')
-                    else:  # piece['colour'] == 'BLACK'
-                        count += self.countPieceAttack(self.board, piece, piece['location'], 'BLACK')
+                    count += piece['heuristic_diff']
         return count
 
     def findPieceById(self, id):
