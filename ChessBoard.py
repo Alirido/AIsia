@@ -235,19 +235,16 @@ class ChessBoard:
             for piece in row:
                 if piece != {}:
                     if black:
-                        if piece['Colour'] == 'WHITE':
+                        if piece['colour'] == 'WHITE':
                             return False
-                            break
                     elif white:
-                        if piece['Colour'] == 'BLACK':
+                        if piece['colour'] == 'BLACK':
                             return False
-                            break
                     else:
-                        if piece['Colour'] == 'WHITE':
+                        if piece['colour'] == 'WHITE':
                             white = True
                         else:
                             black = True
-
         return True
 
     def countPieceAttack(self, board, piece, location, colour):
