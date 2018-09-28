@@ -5,7 +5,7 @@ from copy import deepcopy
 
 class ChessBoard:
     size = 8
-    '''
+    """
     a box object may contain the following
         1. id               --> integer
         2. type             --> string  [QUEEN, BISHOP, KNIGHT, ROOK]
@@ -13,11 +13,7 @@ class ChessBoard:
         4. heuristic_same   --> integer
         5. heuristic_diff   --> integer
         5. location         --> tuple   (row, coloumn)
-    
-    function that may be used:
-        countPieceAttack(board, piece, location, colour)
-        newTemporaryBoard(self, board, piece, new_location)
-    '''
+    """
 
     # constructor
     def __init__(self, file_name):
@@ -290,9 +286,15 @@ class ChessBoard:
         return board
 
     def movePiece(self, piece, new_location):
-        self.board[new_location[0]][new_location[1]] = piece                        # move piece
-        self.board[new_location[0]][new_location[1]]['location'] = new_location     # update piece location
-        self.board[piece['location'][0]][piece['location'][1]] = {}                 # delete piece in previous location
+        # old_location = piece['location']
+        # self.board[new_location[0]][new_location[1]] = piece                        # move piece
+        # self.board[new_location[0]][new_location[1]]['location'] = new_location     # update piece location
+        # self.board[old_location[0]][old_location[1]] = {}                           # delete piece in previous location
+        # self._updateAllHeuristics()
+        old_loc = piece['location']
+        piece['location'] = new_location
+        self.board[new_location[0]][new_location[1]] = piece  # move piece
+        self.board[old_loc[0]][old_loc[1]] = {}
         self._updateAllHeuristics()
 
     def _randomizePiecePosition(self, piece):
@@ -308,7 +310,7 @@ class ChessBoard:
             seed(urandom(100))
             row = randint(0, self.size - 1)
             col = randint(0, self.size - 1)
-        self.board[piece['location'][0]][piece['location'][1]] = {}
+        # self.board[piece['location'][0]][piece['location'][1]] = {}
         piece['location'] = (row, col)
         self.board[row][col] = piece
 
@@ -383,3 +385,23 @@ class ChessBoard:
         attack_same = self.countSameHeuristic()
         attack_diff = self.countDiffHeuristic()
         print(attack_same, attack_diff)
+
+    def _printAllPieces(self):
+        for row in self.board:
+            for piece in row:
+                if piece != {}:
+                    print(piece)
+
+
+if __name__ == '__main__':
+    chess_1 = ChessBoard('input3.txt')
+    chess_1.printBoardInfo()
+    chess_1._printAllPieces()
+
+    n = ''
+    while n != 'x':
+        print()
+        chess_1.randomizeBoard()
+        chess_1.printBoardInfo()
+        chess_1._printAllPieces()
+        n = input("Press any key to continue.\nPress 'x' to exit...\n")
