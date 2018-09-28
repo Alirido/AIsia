@@ -8,6 +8,8 @@ if __name__ == "__main__":
     # start-temp
     print('chessboard 1')
     chess_1.printBoardInfo()
+    chess_1.randomizeBoard()
+    chess_1.printBoardInfo()
 
     # chess_2 = deepcopy(chess_1)
     # chess_2.printBoardInfo()

@@ -15,14 +15,18 @@ class SimulatedAnnealing:
     def run(self):
         self.chessBoard.randomizeBoard()
         current = deepcopy(self.chessBoard)
-        solutionFound = False
+        # Below is for debugging purpose
+        current.printBoardInfo()
+
         stop = Decimal('0.05')
-        if self.chessBoard.isSameColour():
+        if self.chessBoard.count_black_pieces == 0 or self.chessBoard.count_white_pieces == 0:
             current_h = current.countSameHeuristic()
-    
+            # Belos is for debugging purpose
+            print(current_h)
+            print()
+
             while self.T > stop:
                 if current_h == 0:
-                    solutionFound = True
                     break
                 self.chessBoard.randomizeBoard()
                 successor = deepcopy(self.chessBoard)
@@ -44,13 +48,9 @@ class SimulatedAnnealing:
                     current_h = successor_h
                 self.T *= self.ch
 
-        if solutionFound == False:
-            self.elapsedTime = self.getElapsedTime()
-            print("Unsuccessful, Elapsed Time: %sms" % (str(self.elapsedTime)))
-        else:
-            print(current.printBoardInfo())
-            self.elapsedTime = self.getElapsedTime()
-            print("Success, Elapsed Time: %sms" % (str(self.elapsedTime)))
+        current.printBoardInfo()
+        self.elapsedTime = self.getElapsedTime()
+        print("Success, Elapsed Time: %sms" % (str(self.elapsedTime)))
 
         return self.elapsedTime
 
