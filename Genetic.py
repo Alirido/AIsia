@@ -1,6 +1,7 @@
 from copy import deepcopy
 from random import randint, seed, randrange
 from os import urandom
+from time import clock
 
 from ChessBoard import ChessBoard
 
@@ -14,6 +15,7 @@ def geneticAlgorithm(chessboard):
         chessboard.randomizeBoard()
         fitness = chessboard.countDiffHeuristic() - chessboard.countSameHeuristic()  # this is the fitness function
         fitness_string_population.append([fitness, _ChessboardToString(chessboard.board)])
+
     # sort the inviiduals based on fitness function
     fitness_string_population = sorted(fitness_string_population, key=lambda x: x[0], reverse=True)
 
@@ -21,17 +23,18 @@ def geneticAlgorithm(chessboard):
     fittest_individual = fitness_string_population[0]
     fittest_count = 1
 
-    iteration = 1
-
     # start of iteration of genetic algorithm
+    iteration = 1
     while fittest_count < (population_count*3):
         print('iteration', iteration)
         iteration += 1
         print('fittest individual:', fittest_individual)
         print('fittest count:', fittest_count)
-        fitness_string_population = _GeneticMutation(fitness_string_population)
+
+        fitness_string_population = _GeneticMutation(fitness_string_population, population_count)
         for i in range(len(fitness_string_population)):
-            fitness_string_population[i] = [_fitnessFunction(fitness_string_population[i], deepcopy(init_chessboard)), fitness_string_population[i]]
+            fitness_string_population[i] = [_fitnessFunction(fitness_string_population[i], deepcopy(init_chessboard)),
+                                            fitness_string_population[i]]
         # sort the inviiduals based on fitness function
         fitness_string_population = sorted(fitness_string_population, key=lambda x: x[0], reverse=True)
         print()
@@ -59,59 +62,69 @@ def _ChessboardToString(board):
     return ''.join([i[1] for i in piece_arr])
 
 
-def _GeneticMutation(fitness_string):
+def _GeneticMutation(fitness_string, population_space):
     """
     the iterative steps of genetic algorithm
     """
 
-    # selecting mates
-    str_couples = []
-    while fitness_string != []:
-        seed(urandom(100))
-        if len(fitness_string) > 2:
-            index_1 = randint(0, len(fitness_string) - 1)
-            index_2 = randint(0, len(fitness_string) - 1)
-            while index_1 == index_2:
-                index_1 = randint(0, len(fitness_string) - 1)
-                index_2 = randint(0, len(fitness_string) - 1)
-        else:
-            index_1 = 0
-            index_2 = 1
-        string_1 = fitness_string[index_1]
-        string_2 = fitness_string[index_2]
-        str_couples.append([string_1[1], string_2[1]])
-        fitness_string.remove(string_1)
-        fitness_string.remove(string_2)
+    # selecting and crossing
+    individual_result = []
+    population_space_left = population_space
+    for i in range(len(fitness_string)-1):
+        individual = fitness_string[i][1]
+        potential_mates = fitness_string[i+1:]
+        new_individuals, population_space_left = _selectedMates(individual, potential_mates, population_space_left)
+        individual_result.extend(new_individuals)
+        if population_space_left <= 0:
+            break
 
-    string_length = len(str_couples[0][0])
-    string_result = []
-    # split and cross
-    for i in range(len(str_couples)):
-        seed(urandom(100))
-        split_index = randrange(2, string_length-2, 2)  # choose split position
-        substring_1 = str_couples[i][0][:split_index]
-        substring_2 = str_couples[i][1][:split_index]
-        string_result.append(substring_2 + str_couples[i][0][split_index:])
-        string_result.append(substring_1 + str_couples[i][1][split_index:])
+    # str_couples = []
+    # # selecting mates
+    # while fitness_string != []:
+    #     seed(urandom(100))
+    #     if len(fitness_string) > 2:
+    #         index_1 = randint(0, len(fitness_string) - 1)
+    #         index_2 = randint(0, len(fitness_string) - 1)
+    #         while index_1 == index_2:
+    #             index_1 = randint(0, len(fitness_string) - 1)
+    #             index_2 = randint(0, len(fitness_string) - 1)
+    #     else:
+    #         index_1 = 0
+    #         index_2 = 1
+    #     string_1 = fitness_string[index_1]
+    #     string_2 = fitness_string[index_2]
+    #     str_couples.append([string_1[1], string_2[1]])
+    #     fitness_string.remove(string_1)
+    #     fitness_string.remove(string_2)
+    #
+    # string_length = len(str_couples[0][0])
+    # string_result = []
+    # # split and cross
+    # for i in range(len(str_couples)):
+    #     seed(urandom(100))
+    #     split_index = randrange(2, string_length-2, 2)  # choose split position
+    #     substring_1 = str_couples[i][0][:split_index]
+    #     substring_2 = str_couples[i][1][:split_index]
+    #     string_result.append(substring_2 + str_couples[i][0][split_index:])
+    #     string_result.append(substring_1 + str_couples[i][1][split_index:])
 
     # mutation
-    for i in range(len(string_result)):
+    for i in range(len(individual_result)):
         seed(urandom(100))
         probability = randint(1, 10)
-        if probability < 4:  # probability of mutation = 0.4
-            str_temp = list(string_result[i])
+        str_temp = list(individual_result[i])
+        str_temp[randint(0, len(str_temp) - 1)] = str(randint(0, 7))
+        str_temp = ''.join(str_temp)
+        while not(_isStringUnique(str_temp)) and (probability < 4):
+            str_temp = list(individual_result[i])
             str_temp[randint(0, len(str_temp) - 1)] = str(randint(0, 7))
             str_temp = ''.join(str_temp)
-            while not(_isStringUnique(str_temp)) and (probability < 4):
-                str_temp = list(string_result[i])
-                str_temp[randint(0, len(str_temp) - 1)] = str(randint(0, 7))
-                str_temp = ''.join(str_temp)
-                probability = randint(1, 10)
-            if probability < 4:
-                string_result[i] = str_temp
+            probability = randint(1, 10)
+        if probability < 4:     # probability of mutation: 40%
+            individual_result[i] = str_temp
 
     # return the modified strings
-    return string_result
+    return individual_result
 
 
 def _isStringUnique(string):
@@ -122,6 +135,38 @@ def _isStringUnique(string):
                 return False
     return True
 
+def _selectedMates(individual, potential_mates, population_space_left):
+    """
+    <<< used only for _GeneticMutation() >>>
+    :param individual: string of the individual
+    :param potential_mates: list of strings of individual's potential mates' string
+    :param population_space_left: amount of individuals left to be generated
+    :return:
+    """
+    print('individual', individual)
+    string_length = len(individual)
+    rand_bound = string_length // 2
+    new_individuals = []
+
+    seed(clock())
+    # i = 0
+    for _,mate in potential_mates:
+        # print('mate', mate)
+        rand_count = 1
+        split_index = randrange(2, string_length - 2, 2)  # choose split position
+        indv_2 = mate[:split_index] + individual[split_index:]
+        indv_1 = individual[:split_index] + mate[split_index:]
+        while not(_isStringUnique(indv_1) and _isStringUnique(indv_2)) and (rand_count < rand_bound):
+            rand_count += 1
+            split_index = randrange(2, string_length - 2, 2)  # choose split position
+            indv_2 = mate[:split_index] + individual[split_index:]
+            indv_1 = individual[:split_index] + mate[split_index:]
+        if rand_count < rand_bound:
+            population_space_left -= 2
+            new_individuals.extend([indv_1, indv_2])
+        if population_space_left <= 0:      # stop the loop if population count is reached
+            break
+    return new_individuals, population_space_left
 
 def _fitnessFunction(string, chessboard):
     # print('FITNESS FUNCTION')
@@ -150,8 +195,13 @@ def _translateBoardWithFinalResult(string, chessboard):
     return chessboard
 
 if __name__ == '__main__':
-    chess = ChessBoard('n-queen.txt')
+    chess = ChessBoard('nrook.txt')
 
     print('genetic algorithm')
     geneticAlgorithm(chess).printBoardInfo()
+
+    # individual = '102030'
+    # potential_mates = ['151410', '155721', '636132']
+    # selected = _selectedMates(individual, potential_mates, 2)
+    # print(selected)
 
