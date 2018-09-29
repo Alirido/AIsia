@@ -194,15 +194,13 @@ class ChessBoard:
         if row + 1 < self.size:
             if (col - 2 >= 0) and (board[row + 1][col - 2] != {}) and (board[row + 1][col - 2]['colour'] == colour):
                 count += 1
-            if (col + 2 < self.size) and (board[row + 1][col + 2] != {}) and (
-                    board[row + 1][col + 2]['colour'] == colour):
+            if (col + 2 < self.size) and (board[row + 1][col + 2] != {}) and (board[row + 1][col + 2]['colour'] == colour):
                 count += 1
             # check fourth row
             if row + 2 < self.size:
                 if (col - 1 >= 0) and (board[row + 2][col - 1] != {}) and (board[row + 2][col - 1]['colour'] == colour):
                     count += 1
-                if (col + 1 < self.size) and (board[row + 2][col + 1] != {}) and (
-                        board[row + 2][col + 1]['colour'] == colour):
+                if (col + 1 < self.size) and (board[row + 2][col + 1] != {}) and (board[row + 2][col + 1]['colour'] == colour):
                     count += 1
         return count
 
@@ -264,19 +262,19 @@ class ChessBoard:
         return board
 
     def movePiece(self, piece, new_location):
-        # old_location = piece['location']
-        # self.board[new_location[0]][new_location[1]] = piece                        # move piece
-        # self.board[new_location[0]][new_location[1]]['location'] = new_location     # update piece location
-        # self.board[old_location[0]][old_location[1]] = {}                           # delete piece in previous location
-        # self._updateAllHeuristics()
         old_loc = piece['location']
         piece['location'] = new_location
-        self.board[new_location[0]][new_location[1]] = piece  # move piece
-        self.board[old_loc[0]][old_loc[1]] = {}
+        piece_temp = self.board[new_location[0]][new_location[1]]
+        # swap places
+        self.board[new_location[0]][new_location[1]] = piece
+        if piece_temp != {}:
+            piece_temp['location'] = old_loc
+        self.board[old_loc[0]][old_loc[1]] = piece_temp
         self._updateAllHeuristics()
 
     def _randomizePiecePosition(self, piece):
         """
+        <<< only for randomizeBoard() usage >>>
         :param piece: the piece whose location will be randomized
         :return:
         """
@@ -284,23 +282,12 @@ class ChessBoard:
         seed(urandom(100))
         row = randint(0, self.size - 1)
         col = randint(0, self.size - 1)
-        while self.board[row][col] != {}:
-            seed(urandom(100))
-            row = randint(0, self.size - 1)
-            col = randint(0, self.size - 1)
-        # self.board[piece['location'][0]][piece['location'][1]] = {}
-        piece['location'] = (row, col)
-        self.board[row][col] = piece
+        self.movePiece(piece, (row, col))
 
     def randomizeBoard(self):
-        temp_board = deepcopy(self.board)
         # place pieces in a new, random position
-        for row in temp_board:
-            for piece in row:
-                if piece != {}:
-                    self._randomizePiecePosition(piece)
-        # calculate new heuristic of each 
-        self._updateAllHeuristics()
+        for piece_id in range(self.count_black_pieces + self.count_white_pieces):
+            self._randomizePiecePosition(self.findPieceById(piece_id))
         
     def countSameHeuristic(self):
         """
