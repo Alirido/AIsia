@@ -228,28 +228,6 @@ class ChessBoard:
             for piece in row:
                 if piece != {}:
                     self._setPieceHeuristic(piece)
-    
-    def isSameColour(self):
-        """
-        To check if chessboard play with white or black colour only
-        """
-        white = False
-        black = False
-        for row in self.board:
-            for piece in row:
-                if piece != {}:
-                    if black:
-                        if piece['colour'] == 'WHITE':
-                            return False
-                    elif white:
-                        if piece['colour'] == 'BLACK':
-                            return False
-                    else:
-                        if piece['colour'] == 'WHITE':
-                            white = True
-                        else:
-                            black = True
-        return True
 
     def countPieceAttack(self, board, piece, location, colour):
         """
