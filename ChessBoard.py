@@ -199,10 +199,10 @@ class ChessBoard:
                 count += 1
             # check fourth row
             if row + 2 < self.size:
-                if (col - 1 >= 0) and (board[row + 1][col - 1] != {}) and (board[row + 1][col - 1]['colour'] == colour):
+                if (col - 1 >= 0) and (board[row + 2][col - 1] != {}) and (board[row + 2][col - 1]['colour'] == colour):
                     count += 1
-                if (col + 1 < self.size) and (board[row + 1][col + 1] != {}) and (
-                        board[row + 1][col + 1]['colour'] == colour):
+                if (col + 1 < self.size) and (board[row + 2][col + 1] != {}) and (
+                        board[row + 2][col + 1]['colour'] == colour):
                     count += 1
         return count
 
