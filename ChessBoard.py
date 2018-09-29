@@ -165,7 +165,6 @@ class ChessBoard:
             :param position: (tuple) the position of the piece
             :param colour: the colour of what the piece can attack
             :return:
-
             attack range of a knight
             - o - o -   first row
             o - - - o   second row
@@ -176,32 +175,44 @@ class ChessBoard:
         count = 0
         row = position[0]
         col = position[1]
+        #print('bidak pada, ' ,row ,' ',col)
+
         # check second row
         if row - 1 >= 0:
             if (col - 2 >= 0) and (board[row - 1][col - 2] != {}) and (board[row - 1][col - 2]['colour'] == colour):
                 count += 1
+                #print(row-1,col-2)
             if (col + 2 < self.size) and (board[row - 1][col + 2] != {}) and (
                     board[row - 1][col + 2]['colour'] == colour):
                 count += 1
+                #print(row-1,col+2)
             # check first row
-            if row - 2 >= 0:
-                if (col - 1 >= 0) and (board[row - 2][col - 1] != {}) and (board[row - 2][col - 1]['colour'] == colour):
-                    count += 1
-                if (col + 1 < self.size) and (board[row - 2][col - 1] != {}) and (
-                        board[row - 2][col - 1]['colour'] == colour):
-                    count += 1
+        if row - 2 >= 0:
+            if (col - 1 >= 0) and (board[row - 2][col - 1] != {}) and (board[row - 2][col - 1]['colour'] == colour):
+                count += 1
+         #       print(row-2,col-1)
+            if (col + 1 < self.size) and (board[row - 2][col + 1] != {}) and (
+                    board[row - 2][col + 1]['colour'] == colour):
+                count += 1
+          #      print(row-2,col+1)
         # check third row
         if row + 1 < self.size:
             if (col - 2 >= 0) and (board[row + 1][col - 2] != {}) and (board[row + 1][col - 2]['colour'] == colour):
                 count += 1
-            if (col + 2 < self.size) and (board[row + 1][col + 2] != {}) and (board[row + 1][col + 2]['colour'] == colour):
+           #     print(row+1,col-2)
+            if (col + 2 < self.size) and (board[row + 1][col + 2] != {}) and (
+                    board[row + 1][col + 2]['colour'] == colour):
                 count += 1
+            #    print(row+1,col+2)
             # check fourth row
-            if row + 2 < self.size:
-                if (col - 1 >= 0) and (board[row + 2][col - 1] != {}) and (board[row + 2][col - 1]['colour'] == colour):
-                    count += 1
-                if (col + 1 < self.size) and (board[row + 2][col + 1] != {}) and (board[row + 2][col + 1]['colour'] == colour):
-                    count += 1
+        if row + 2 < self.size:
+            if (col - 1 >= 0) and (board[row + 2][col - 1] != {}) and (board[row + 2][col - 1]['colour'] == colour):
+                count += 1
+             #   print(row+2,col-1)
+            if (col + 1 < self.size) and (board[row + 2][col + 1] != {}) and (
+                    board[row + 2][col + 1]['colour'] == colour):
+                count += 1
+              #  print(row+2,col+1)
         return count
 
     def _setPieceHeuristic(self, piece):
