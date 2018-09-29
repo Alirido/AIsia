@@ -1,29 +1,25 @@
-from copy import deepcopy
-
 from ChessBoard import ChessBoard
-from SimulatedAnnealing import SimulatedAnnealing
 
 if __name__ == "__main__":
-    chess_1 = ChessBoard('input2.txt')
-    # start-temp
-    print('chessboard 1')
-    chess_1.printBoardInfo()
-    chess_1.randomizeBoard()
-    chess_1.printBoardInfo()
+    file_path = input('Masukan nama file input: ')
+    chess = ChessBoard(file_path)
 
-    # chess_2 = deepcopy(chess_1)
-    # chess_2.printBoardInfo()
+    print('Pilihan algoritma:')
+    print('1. Hill-Climbing')
+    print('2. Simulated Annealing')
+    print('3. Genetic')
+    algo_choice = int(input('Algoritma mana yang ingin dipakai? '))
+    while algo_choice not in [1, 2, 3]:
+        print()
+        print('Input salah. Tolong ulangi.')
+        algo_choice = int(input('Algoritma mana yang ingin dipakai? '))
 
-    # chess_1.randomizeBoard()
-    # print('CHESS 1')
-    # chess_1.printBoardInfo()
-    # print('CHESS 2')
-    # chess_2.printBoardInfo()
+    if algo_choice == 1:        # hill-climbing
+        algo_name = 'Hill-Climbing'
+    elif algo_choice == 2:      # simulated annealing
+        algo_name = 'Simulated Annealing'
+    else:                       # genetic (algo_choice == 3)
+        algo_name = 'Genetic'
 
-    print()
-    SimulatedAnnealing(chess_1).run()
-
-    # chess_1.randomizeBoard()
-    # chess_1.printBoardInfo()
-    
-    # end-temp
+    print('Hasil dari algoritma ' + algo_name)
+    chess.printBoardInfo()

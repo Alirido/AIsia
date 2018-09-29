@@ -10,7 +10,7 @@ def geneticAlgorithm(chessboard):
     # generating the population
     init_chessboard = deepcopy(chessboard)
     fitness_string_population = []
-    population_count = 6 * (chessboard.count_black_pieces + chessboard.count_white_pieces)
+    population_count = 8 * (chessboard.count_black_pieces + chessboard.count_white_pieces)
     for _ in range(population_count):
         chessboard.randomizeBoard()
         fitness = chessboard.countDiffHeuristic() - chessboard.countSameHeuristic()  # this is the fitness function
@@ -21,15 +21,13 @@ def geneticAlgorithm(chessboard):
 
     # start of genetic algorithm iteration
     fittest_individual = fitness_string_population[0]
+    print('fittest individual:', fittest_individual)
     fittest_count = 1
 
     # start of iteration of genetic algorithm
     iteration = 1
     while fittest_count < (population_count*3):
-        print('iteration', iteration)
         iteration += 1
-        print('fittest individual:', fittest_individual)
-        print('fittest count:', fittest_count)
 
         fitness_string_population = _GeneticMutation(fitness_string_population, population_count)
         for i in range(len(fitness_string_population)):
@@ -37,19 +35,20 @@ def geneticAlgorithm(chessboard):
                                             fitness_string_population[i]]
         # sort the inviiduals based on fitness function
         fitness_string_population = sorted(fitness_string_population, key=lambda x: x[0], reverse=True)
-        print()
 
         # checking whether the result have become convergent or not
-        if fittest_individual[0] <= fitness_string_population[0][0]:
-            if fittest_individual[0] == fitness_string_population[0][0]:
-                fittest_count += 1
-            else:
-                fittest_count = 0
-            fittest_individual = fitness_string_population[0]
+        if fittest_individual[0] < fitness_string_population[0][0]:
+            print()
+            print('iteration of change:', iteration)
+            print('last count:', fittest_count)
+            fittest_count = 0
+            fittest_individual = deepcopy(fitness_string_population[0])
+            print('NEW fittest individual:', fittest_individual)
         else:
             fittest_count += 1
 
     return _translateBoardWithFinalResult(fittest_individual[1], init_chessboard)
+
 
 def _ChessboardToString(board):
     piece_arr = []
@@ -77,36 +76,6 @@ def _GeneticMutation(fitness_string, population_space):
         individual_result.extend(new_individuals)
         if population_space_left <= 0:
             break
-
-    # str_couples = []
-    # # selecting mates
-    # while fitness_string != []:
-    #     seed(urandom(100))
-    #     if len(fitness_string) > 2:
-    #         index_1 = randint(0, len(fitness_string) - 1)
-    #         index_2 = randint(0, len(fitness_string) - 1)
-    #         while index_1 == index_2:
-    #             index_1 = randint(0, len(fitness_string) - 1)
-    #             index_2 = randint(0, len(fitness_string) - 1)
-    #     else:
-    #         index_1 = 0
-    #         index_2 = 1
-    #     string_1 = fitness_string[index_1]
-    #     string_2 = fitness_string[index_2]
-    #     str_couples.append([string_1[1], string_2[1]])
-    #     fitness_string.remove(string_1)
-    #     fitness_string.remove(string_2)
-    #
-    # string_length = len(str_couples[0][0])
-    # string_result = []
-    # # split and cross
-    # for i in range(len(str_couples)):
-    #     seed(urandom(100))
-    #     split_index = randrange(2, string_length-2, 2)  # choose split position
-    #     substring_1 = str_couples[i][0][:split_index]
-    #     substring_2 = str_couples[i][1][:split_index]
-    #     string_result.append(substring_2 + str_couples[i][0][split_index:])
-    #     string_result.append(substring_1 + str_couples[i][1][split_index:])
 
     # mutation
     for i in range(len(individual_result)):
@@ -143,7 +112,6 @@ def _selectedMates(individual, potential_mates, population_space_left):
     :param population_space_left: amount of individuals left to be generated
     :return:
     """
-    print('individual', individual)
     string_length = len(individual)
     rand_bound = string_length // 2
     new_individuals = []
@@ -169,39 +137,38 @@ def _selectedMates(individual, potential_mates, population_space_left):
     return new_individuals, population_space_left
 
 def _fitnessFunction(string, chessboard):
-    # print('FITNESS FUNCTION')
-    # print('string:', string)
     board_temp = deepcopy(chessboard)
     amount_of_piece = chessboard.count_white_pieces + chessboard.count_black_pieces
     for piece_id in range(amount_of_piece):
-        # chessboard.printBoardInfo()
-        # print('id', piece_id)
         row = int(string[piece_id * 2])
         col = int(string[piece_id * 2 + 1])
         piece = board_temp.findPieceById(piece_id)
         chessboard.movePiece(piece, (row, col))
     return chessboard.countDiffHeuristic() - chessboard.countSameHeuristic()
 
+
 def _translateBoardWithFinalResult(string, chessboard):
     board_temp = deepcopy(chessboard)
     amount_of_piece = chessboard.count_white_pieces + chessboard.count_black_pieces
     for piece_id in range(amount_of_piece):
-        # chessboard.printBoardInfo()
-        # print('id', piece_id)
         row = int(string[piece_id * 2])
         col = int(string[piece_id * 2 + 1])
         piece = board_temp.findPieceById(piece_id)
         chessboard.movePiece(piece, (row, col))
     return chessboard
 
+
 if __name__ == '__main__':
-    chess = ChessBoard('nrook.txt')
-
-    print('genetic algorithm')
-    geneticAlgorithm(chess).printBoardInfo()
-
-    # individual = '102030'
-    # potential_mates = ['151410', '155721', '636132']
-    # selected = _selectedMates(individual, potential_mates, 2)
-    # print(selected)
-
+    n = int(input('Berapa kali pencarian? '))
+    for i in range(n):
+        chess = ChessBoard('nknight.txt')
+        print('genetic algorithm')
+        print('RESULT', i+1, 'OF', n)
+        chess = geneticAlgorithm(chess)
+        chess.printBoardInfo()
+        if chess.countSameHeuristic() in heuristic.keys():
+            heuristic[chess.countSameHeuristic()] += 1
+        else:
+            heuristic[chess.countSameHeuristic()] = 1
+        print()
+        print()
