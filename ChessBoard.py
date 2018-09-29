@@ -289,7 +289,6 @@ class ChessBoard:
         :param piece: the piece whose location will be randomized
         :return:
         """
-        self.board[piece['location'][0]][piece['location'][1]] = {}
         seed(urandom(100))
         row = randint(0, self.size - 1)
         col = randint(0, self.size - 1)
