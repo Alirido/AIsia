@@ -11,13 +11,6 @@ def HillClimbingAlgorithm(chessboard):
         empty_loc = EmptyLocation(chessboard)
         piece_list = Pieces(chessboard)
         successor = BestNeighbor(chessboard, empty_loc, piece_list)
-    # print()
-    # print('Hasil')
-    # chessboard.printBoardInfo()
-    # '''for row in chessboard.board:
-    #     for bidak in row:
-    #         if(bidak!={}):
-    #             print(bidak)'''
     return chessboard
 
 def EmptyLocation(chessboard):
