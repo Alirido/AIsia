@@ -1,6 +1,5 @@
 from random import randint, seed
 from os import urandom
-from copy import deepcopy
 
 
 class ChessBoard:
@@ -17,12 +16,12 @@ class ChessBoard:
 
     # constructor
     def __init__(self, file_name):
+        """
+        :param file_name: the name of the input file (e.g. 'input.txt')
+        """
         self.board = [[{} for _ in range(8)] for _ in range(8)]
         self.count_black_pieces = 0
         self.count_white_pieces = 0
-        '''
-            file_name = the name of the input file (e.g. 'input.txt')
-        '''
         count = 0
         # read from file
         with open(file_name, 'r') as f:
@@ -78,7 +77,6 @@ class ChessBoard:
             row -= 1
         if (row >= 0) and (board[row][col]['colour'] == colour):
             count += 1
-            # print(board[row][col])
         row = position[0]
         # check to SOUTH
         row += 1
@@ -86,7 +84,6 @@ class ChessBoard:
             row += 1
         if (row < self.size) and (board[row][col]['colour'] == colour):
             count += 1
-            # print(board[row][col])
         row = position[0]
         # check to WEST
         col -= 1
@@ -94,7 +91,6 @@ class ChessBoard:
             col -= 1
         if (col >= 0) and (board[row][col]['colour'] == colour):
             count += 1
-            # print(board[row][col])
         col = position[1]
         # check to EAST
         col += 1
@@ -102,7 +98,6 @@ class ChessBoard:
             col += 1
         if (col < self.size) and (board[row][col]['colour'] == colour):
             count += 1
-            # print(board[row][col])
         return count
 
     def _countDiagonalAttack(self, board, position, colour):
@@ -123,7 +118,6 @@ class ChessBoard:
             col += 1
         if (row >= 0) and (col < self.size) and (board[row][col]['colour'] == colour):
             count += 1
-            # print(board[row][col])
         row = position[0]
         col = position[1]
         # check NORTH-WEST
@@ -134,7 +128,6 @@ class ChessBoard:
             col -= 1
         if (row >= 0) and (col >= 0) and (board[row][col]['colour'] == colour):
             count += 1
-            # print(board[row][col])
         row = position[0]
         col = position[1]
         # check SOUTH-EAST
@@ -145,7 +138,6 @@ class ChessBoard:
             col += 1
         if (row < self.size) and (col < self.size) and (board[row][col]['colour'] == colour):
             count += 1
-            # print(board[row][col])
         row = position[0]
         col = position[1]
         # check SOUTH-WEST
@@ -156,7 +148,6 @@ class ChessBoard:
             col -= 1
         if (row < self.size) and (col >= 0) and (board[row][col]['colour'] == colour):
             count += 1
-            # print(board[row][col])         
         return count
 
     def _countKnightAttack(self, board, position, colour):
@@ -175,31 +166,25 @@ class ChessBoard:
         count = 0
         row = position[0]
         col = position[1]
-        #print('bidak pada, ' ,row ,' ',col)
 
         # check second row
         if row - 1 >= 0:
             if (col - 2 >= 0) and (board[row - 1][col - 2] != {}) and (board[row - 1][col - 2]['colour'] == colour):
                 count += 1
-                #print(row-1,col-2)
             if (col + 2 < self.size) and (board[row - 1][col + 2] != {}) and (
                     board[row - 1][col + 2]['colour'] == colour):
                 count += 1
-                #print(row-1,col+2)
             # check first row
         if row - 2 >= 0:
             if (col - 1 >= 0) and (board[row - 2][col - 1] != {}) and (board[row - 2][col - 1]['colour'] == colour):
                 count += 1
-         #       print(row-2,col-1)
             if (col + 1 < self.size) and (board[row - 2][col + 1] != {}) and (
                     board[row - 2][col + 1]['colour'] == colour):
                 count += 1
-          #      print(row-2,col+1)
         # check third row
         if row + 1 < self.size:
             if (col - 2 >= 0) and (board[row + 1][col - 2] != {}) and (board[row + 1][col - 2]['colour'] == colour):
                 count += 1
-           #     print(row+1,col-2)
             if (col + 2 < self.size) and (board[row + 1][col + 2] != {}) and (
                     board[row + 1][col + 2]['colour'] == colour):
                 count += 1
@@ -208,11 +193,9 @@ class ChessBoard:
         if row + 2 < self.size:
             if (col - 1 >= 0) and (board[row + 2][col - 1] != {}) and (board[row + 2][col - 1]['colour'] == colour):
                 count += 1
-             #   print(row+2,col-1)
             if (col + 1 < self.size) and (board[row + 2][col + 1] != {}) and (
                     board[row + 2][col + 1]['colour'] == colour):
                 count += 1
-              #  print(row+2,col+1)
         return count
 
     def _setPieceHeuristic(self, piece):
@@ -259,18 +242,6 @@ class ChessBoard:
         else:  # piece.type == KNIGHT
             return self._countKnightAttack(board, location, colour)
 
-    def newTemporaryBoard(self, board, piece, new_location):
-        """
-            <<< NO LONGER UPDATED. MOVE TO movePiece(self, piece, new_location) >>>
-            :param board: the old chessboard
-            :param piece: the piece that will be moved
-            :param new_location: the location of piece that will be located
-            :return:
-        """
-        board[piece['location'][0]][piece['location'][1]] = {}
-        piece['location'] = new_location
-        board[new_location[0]][new_location[1]] = piece
-        return board
 
     def movePiece(self, piece, new_location):
         old_loc = piece['location']
@@ -366,17 +337,3 @@ class ChessBoard:
             for piece in row:
                 if piece != {}:
                     print(piece)
-
-
-if __name__ == '__main__':
-    chess_1 = ChessBoard('input3.txt')
-    chess_1.printBoardInfo()
-    chess_1._printAllPieces()
-
-    n = ''
-    while n != 'x':
-        print()
-        chess_1.randomizeBoard()
-        chess_1.printBoardInfo()
-        chess_1._printAllPieces()
-        n = input("Press any key to continue.\nPress 'x' to exit...\n")

@@ -1,4 +1,5 @@
-import random, math, time
+import random
+import math
 from decimal import Decimal
 from datetime import datetime
 from copy import deepcopy
@@ -7,8 +8,8 @@ class SimulatedAnnealing:
     # Constructor
     def __init__(self, chessBoard):
         self.chessBoard = chessBoard
-        self.T = 64*64 # Temperature
-        self.ch = 0.001 # Cooling Schedule
+        self.T = 64*64      # Temperature
+        self.ch = 0.001     # Cooling Schedule
         self.elapsedTime = 0
         self.startTime = datetime.now()
 
@@ -28,8 +29,8 @@ class SimulatedAnnealing:
                 successor_h = successor.countSameHeuristic()
                 delta_h = successor_h - current_h
                 if (delta_h <= 0) or math.exp(delta_h / self.T) > random.uniform(0.0, 1.0):
-                	current = deepcopy(successor)
-                	current_h = successor_h
+                    current = deepcopy(successor)
+                    current_h = successor_h
                 self.T -= self.ch
         else:
             current_h = current.countDiffHeuristic() - current.countSameHeuristic()

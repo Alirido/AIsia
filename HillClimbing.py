@@ -3,8 +3,6 @@ from copy import deepcopy
 from ChessBoard import ChessBoard
 
 def HillClimbingAlgorithm(chessboard):
-    print('Inisialisasi')
-    chessboard.printBoardInfo()
     empty_loc = EmptyLocation(chessboard)
     piece_list = Pieces(chessboard)
     successor = BestNeighbor(chessboard, empty_loc, piece_list)
@@ -13,13 +11,14 @@ def HillClimbingAlgorithm(chessboard):
         empty_loc = EmptyLocation(chessboard)
         piece_list = Pieces(chessboard)
         successor = BestNeighbor(chessboard, empty_loc, piece_list)
-    print()
-    print('Hasil')
-    chessboard.printBoardInfo()
-    '''for row in chessboard.board:
-        for bidak in row:
-            if(bidak!={}):
-                print(bidak)'''
+    # print()
+    # print('Hasil')
+    # chessboard.printBoardInfo()
+    # '''for row in chessboard.board:
+    #     for bidak in row:
+    #         if(bidak!={}):
+    #             print(bidak)'''
+    return chessboard
 
 def EmptyLocation(chessboard):
     empty_loc = []
@@ -38,8 +37,6 @@ def Pieces(chessboard):
     return piece_list
 
 def heuristic(chessboard):
-    #if(chessboard.count_white_pieces() == chessboard.count_white_pieces() + chessboard.count_black_pieces()):
-     #   return chessboard.countSameHeuristic()
     return chessboard.countDiffHeuristic() - chessboard.countSameHeuristic()
 
 def BestNeighbor(chessboard, empty_loc, piece_list):
@@ -54,14 +51,4 @@ def BestNeighbor(chessboard, empty_loc, piece_list):
             if(temp_heuristic > max_heuristic):
                 best_board = temp_board
                 max_heuristic = temp_heuristic
-    '''print('chessboard')
-    chessboard.printBoardInfo()
-    print('best_board')
-    best_board.printBoardInfo()'''
     return best_board
-
-if __name__ == '__main__':
-    chess = ChessBoard('input3.txt')
-    chess.randomizeBoard()
-    #print('genetic algorithm')
-    HillClimbingAlgorithm(chess)

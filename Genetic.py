@@ -3,8 +3,6 @@ from random import randint, seed, randrange
 from os import urandom
 from time import clock
 
-from ChessBoard import ChessBoard
-
 
 def geneticAlgorithm(chessboard):
     # generating the population
@@ -21,14 +19,10 @@ def geneticAlgorithm(chessboard):
 
     # start of genetic algorithm iteration
     fittest_individual = fitness_string_population[0]
-    print('fittest individual:', fittest_individual)
     fittest_count = 1
 
     # start of iteration of genetic algorithm
-    iteration = 1
     while fittest_count < (population_count*3):
-        iteration += 1
-
         fitness_string_population = _GeneticMutation(fitness_string_population, population_count)
         for i in range(len(fitness_string_population)):
             fitness_string_population[i] = [_fitnessFunction(fitness_string_population[i], deepcopy(init_chessboard)),
@@ -38,16 +32,12 @@ def geneticAlgorithm(chessboard):
 
         # checking whether the result have become convergent or not
         if fittest_individual[0] < fitness_string_population[0][0]:
-            print()
-            print('iteration of change:', iteration)
-            print('last count:', fittest_count)
             fittest_count = 0
             fittest_individual = deepcopy(fitness_string_population[0])
-            print('NEW fittest individual:', fittest_individual)
         else:
             fittest_count += 1
 
-    return _translateBoardWithFinalResult(fittest_individual[1], init_chessboard)
+    return _StringToChessboard(fittest_individual[1], init_chessboard)
 
 
 def _ChessboardToString(board):
@@ -59,6 +49,17 @@ def _ChessboardToString(board):
                 piece_arr.append([piece['id'], loc_str])
     piece_arr = sorted(piece_arr, key=lambda p: p[0])
     return ''.join([i[1] for i in piece_arr])
+
+
+def _StringToChessboard(string, chessboard):
+    board_temp = deepcopy(chessboard)
+    amount_of_piece = chessboard.count_white_pieces + chessboard.count_black_pieces
+    for piece_id in range(amount_of_piece):
+        row = int(string[piece_id * 2])
+        col = int(string[piece_id * 2 + 1])
+        piece = board_temp.findPieceById(piece_id)
+        chessboard.movePiece(piece, (row, col))
+    return chessboard
 
 
 def _GeneticMutation(fitness_string, population_space):
@@ -137,38 +138,5 @@ def _selectedMates(individual, potential_mates, population_space_left):
     return new_individuals, population_space_left
 
 def _fitnessFunction(string, chessboard):
-    board_temp = deepcopy(chessboard)
-    amount_of_piece = chessboard.count_white_pieces + chessboard.count_black_pieces
-    for piece_id in range(amount_of_piece):
-        row = int(string[piece_id * 2])
-        col = int(string[piece_id * 2 + 1])
-        piece = board_temp.findPieceById(piece_id)
-        chessboard.movePiece(piece, (row, col))
+    chessboard = _StringToChessboard(string, chessboard)
     return chessboard.countDiffHeuristic() - chessboard.countSameHeuristic()
-
-
-def _translateBoardWithFinalResult(string, chessboard):
-    board_temp = deepcopy(chessboard)
-    amount_of_piece = chessboard.count_white_pieces + chessboard.count_black_pieces
-    for piece_id in range(amount_of_piece):
-        row = int(string[piece_id * 2])
-        col = int(string[piece_id * 2 + 1])
-        piece = board_temp.findPieceById(piece_id)
-        chessboard.movePiece(piece, (row, col))
-    return chessboard
-
-
-if __name__ == '__main__':
-    n = int(input('Berapa kali pencarian? '))
-    for i in range(n):
-        chess = ChessBoard('nknight.txt')
-        print('genetic algorithm')
-        print('RESULT', i+1, 'OF', n)
-        chess = geneticAlgorithm(chess)
-        chess.printBoardInfo()
-        if chess.countSameHeuristic() in heuristic.keys():
-            heuristic[chess.countSameHeuristic()] += 1
-        else:
-            heuristic[chess.countSameHeuristic()] = 1
-        print()
-        print()
