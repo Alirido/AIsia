@@ -28,9 +28,7 @@ if __name__ == "__main__":
     elif algo_choice == 2:      # simulated annealing
         algo_name = 'Simulated Annealing'
         start_time = clock()
-        sa = SimulatedAnnealing(chess)
-        sa.run()
-        chess = deepcopy(sa.chessBoard)
+        chess = SimulatedAnnealing(chess)
     else:                       # genetic (algo_choice == 3)
         algo_name = 'Genetic'
         start_time = clock()
