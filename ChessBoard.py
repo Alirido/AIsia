@@ -14,9 +14,9 @@ class ChessBoard:
         5. location         --> tuple   (row, coloumn)
     """
 
-    # constructor
     def __init__(self, file_name):
         """
+        konstruktor dari objek ChessBoard
         :param file_name: the name of the input file (e.g. 'input.txt')
         """
         self.board = [[{} for _ in range(8)] for _ in range(8)]
@@ -44,10 +44,10 @@ class ChessBoard:
 
     def _addChessPiece(self, id, colour, type):
         """
-            Adding a piece to the board
-            :param id: the id of the given piece
-            :param colour: the colour of the piece
-            :param type: type of the piece
+        menambahkan sebuah bidak ke papan catur
+        :param id: id dari bidak
+        :param colour: warna bidak
+        :param type: jenis bidak
         """
         row = id // self.size
         col = id % self.size
@@ -63,10 +63,11 @@ class ChessBoard:
 
     def _countHorVerAttack(self, board, position, colour):
         """
-            :param board: the chessboard
-            :param position: (tuple) the position of the piece
-            :param colour: the colour of what the piece can attack
-            :return:
+        menghitung serangan vertical dan horizontal sebuah bidak
+        :param board: papan catur
+        :param position: (tuple) posisi bidak
+        :param colour: warna bidak yang akan diserang
+        :return: integer
         """
         count = 0
         row = position[0]
@@ -102,10 +103,11 @@ class ChessBoard:
 
     def _countDiagonalAttack(self, board, position, colour):
         """
-            :param board: the chessboard
-            :param position: (tuple) the position of the piece
-            :param colour: the colour of what the piece can attack
-            :return:
+        menghitung serangan diagonal sebuah bidak
+        :param board: papan catur
+        :param position: (tuple) posisi bidak
+        :param colour: warna bidak yang akan diserang
+        :return: integer
         """
         count = 0
         row = position[0]
@@ -152,16 +154,17 @@ class ChessBoard:
 
     def _countKnightAttack(self, board, position, colour):
         """
-            :param board: the chessboard
-            :param position: (tuple) the position of the piece
-            :param colour: the colour of what the piece can attack
-            :return:
-            attack range of a knight
-            - o - o -   first row
-            o - - - o   second row
-            - - K - -   knight's row
-            o - - - o   third row
-            - o - o -   fourth row
+        menghitung jumlah bidak yang dapat diserang oleh bidak jenis kuda
+        attack range of a knight
+        - o - o -   first row
+        o - - - o   second row
+        - - K - -   knight's row
+        o - - - o   third row
+        - o - o -   fourth row
+        :param board: papan catur
+        :param position: (tuple) posisi dari bidak
+        :param colour: warna bidak yang akan diserang
+        :return: integer
         """
         count = 0
         row = position[0]
@@ -174,7 +177,7 @@ class ChessBoard:
             if (col + 2 < self.size) and (board[row - 1][col + 2] != {}) and (
                     board[row - 1][col + 2]['colour'] == colour):
                 count += 1
-            # check first row
+        # check first row
         if row - 2 >= 0:
             if (col - 1 >= 0) and (board[row - 2][col - 1] != {}) and (board[row - 2][col - 1]['colour'] == colour):
                 count += 1
@@ -188,8 +191,7 @@ class ChessBoard:
             if (col + 2 < self.size) and (board[row + 1][col + 2] != {}) and (
                     board[row + 1][col + 2]['colour'] == colour):
                 count += 1
-            #    print(row+1,col+2)
-            # check fourth row
+        # check fourth row
         if row + 2 < self.size:
             if (col - 1 >= 0) and (board[row + 2][col - 1] != {}) and (board[row + 2][col - 1]['colour'] == colour):
                 count += 1
@@ -198,9 +200,11 @@ class ChessBoard:
                 count += 1
         return count
 
+
     def _setPieceHeuristic(self, piece):
         """
-        :param piece: the piece whose heuristics will be updated
+        memperbaharui nilai heuristik (terhadap bidak yang warna sama dan beda) untuk bidak <piece>
+        :param piece: bidak yang nilai heuristiknya akan diperbaharui
         :return:
         """
         row = piece['location'][0]
@@ -211,27 +215,29 @@ class ChessBoard:
         else:  # piece['colour'] == 'WHITE'
             self.board[row][col]['heuristic_diff'] = self.countPieceAttack(self.board, piece, piece['location'], 'BLACK')
 
+
     def _updateAllHeuristics(self):
         """
-            Update all heuristics (same and different colous) of all pieces
-            <<< use only when the board have reached desired state to minimize usage >>>
+        memperbaharui nilai heuristik (terhadap bidak yang warna sama dan beda) untuk semua bidak
         """
         for row in self.board:
             for piece in row:
                 if piece != {}:
                     self._setPieceHeuristic(piece)
 
+
     def countPieceAttack(self, board, piece, location, colour):
         """
-            :param board: the chessboard (may be temporary)
-            :param piece: the piece that its heuristic will be checked
-            :param location: the location of piece that will be located (may be the same)
-            :param colour: the colour of pieces that will be attacked
-            :return:
+        menghitung jumlah bidak dengan warna <colour> yang diserang oleh <piece>
+        :param board: papan catur
+        :param piece: bidak yang akan dihitung heuristiknya
+        :param location: lokasi baru bidak (bisa saja tetap sama)
+        :param colour: warna bidak yang akan diserang
+        :return: integer
         """
         if piece['location'] != location:
             # moving piece to new location
-            board = self.newTemporaryBoard(board, piece, location)
+            self.movePiece(piece, location)
         # determine type and attack count
         if piece['type'] == 'QUEEN':
             return self._countHorVerAttack(board, location, colour) + self._countDiagonalAttack(board, location, colour)
@@ -244,6 +250,12 @@ class ChessBoard:
 
 
     def movePiece(self, piece, new_location):
+        """
+        memindahkan sebuah bidak ke posisi yang baru
+        jika posisi yang baru terdapat sebuah bidak, maka kedua bidak tersebut akan berpindah posisi
+        :param piece: bidak yang akan dipindah
+        :param new_location: tuple lokasi baru yang akan ditempati bidak
+        """
         old_loc = piece['location']
         piece['location'] = new_location
         piece_temp = self.board[new_location[0]][new_location[1]]
@@ -254,26 +266,31 @@ class ChessBoard:
         self.board[old_loc[0]][old_loc[1]] = piece_temp
         self._updateAllHeuristics()
 
+
     def _randomizePiecePosition(self, piece):
         """
+        menaruh sebuah bidak pada posisi acak yang baru
         <<< only for randomizeBoard() usage >>>
-        :param piece: the piece whose location will be randomized
-        :return:
+        :param piece: bidak yang lokasinya akan diubah
         """
         seed(urandom(100))
         row = randint(0, self.size - 1)
         col = randint(0, self.size - 1)
         self.movePiece(piece, (row, col))
 
+
     def randomizeBoard(self):
-        # place pieces in a new, random position
+        """
+        memposisikan semua bidak pada posisi acak yang baru
+        """
         for piece_id in range(self.count_black_pieces + self.count_white_pieces):
             self._randomizePiecePosition(self.findPieceById(piece_id))
-        
+
+
     def countSameHeuristic(self):
         """
-            Counting the heuristic of attacking the same colour of the board
-            :return:
+        menghitung jumlah pasangan yang menyerang warna yang sama
+        :return: integer
         """
         count = 0
         for row in self.board:
@@ -282,10 +299,11 @@ class ChessBoard:
                     count += piece['heuristic_same']
         return count
 
+
     def countDiffHeuristic(self):
         """
-            Counting the heuristic of attacking different colour of the board
-            :return:
+        menghitung jumlah pasangan yang menyerang yang warna berbeda
+        :return: integer
         """
         count = 0
         for row in self.board:
@@ -294,16 +312,24 @@ class ChessBoard:
                     count += piece['heuristic_diff']
         return count
 
+
     def findPieceById(self, id):
+        """
+        mencari bidak berdasarkan id-nya
+        :param id: integer id bidak yang ingin dicari
+        :return: objek bidak
+        """
         for row in self.board:
             for piece in row:
                 if piece != {} and piece['id'] == id:
                     return piece
         return {}
 
+
     def printBoardInfo(self):
+
         """
-            Print the board contents and the information of the overall heuristics
+        menuliskan bidak pada papan dan informasi heuristiknya (jumlah pasangan menyerang)
         """
         for row in self.board:
             for piece in row:
@@ -331,9 +357,3 @@ class ChessBoard:
         attack_same = self.countSameHeuristic()
         attack_diff = self.countDiffHeuristic()
         print(attack_same, attack_diff)
-
-    def _printAllPieces(self):
-        for row in self.board:
-            for piece in row:
-                if piece != {}:
-                    print(piece)
