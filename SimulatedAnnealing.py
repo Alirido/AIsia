@@ -8,8 +8,8 @@ class SimulatedAnnealing:
     # Constructor
     def __init__(self, chessBoard):
         self.chessBoard = chessBoard
-        self.T = 64*64      # Temperature
-        self.ch = 0.001     # Cooling Schedule
+        self.T = 60*60      # Temperature
+        self.ch = 0.05     # Cooling Schedule
         self.elapsedTime = 0
         self.startTime = datetime.now()
 
@@ -32,6 +32,7 @@ class SimulatedAnnealing:
                     current = deepcopy(successor)
                     current_h = successor_h
                 self.T -= self.ch
+                print(self.T)
         else:
             current_h = current.countDiffHeuristic() - current.countSameHeuristic()
             while self.T > stop:
@@ -44,9 +45,9 @@ class SimulatedAnnealing:
                     current_h = successor_h
                 self.T -= self.ch
 
-        current.printBoardInfo()
-        self.elapsedTime = self.getElapsedTime()
-        print("Success, Elapsed Time: %sms" % (str(self.elapsedTime)))
+        # current.printBoardInfo()
+        # self.elapsedTime = self.getElapsedTime()
+        # print("Success, Elapsed Time: %sms" % (str(self.elapsedTime)))
 
         return self.elapsedTime
 
