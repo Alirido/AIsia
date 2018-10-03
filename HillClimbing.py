@@ -3,6 +3,7 @@ from copy import deepcopy
 from ChessBoard import ChessBoard
 
 def HillClimbingAlgorithm(chessboard):
+    chessboard.randomizeBoard()
     empty_loc = EmptyLocation(chessboard)
     piece_list = Pieces(chessboard)
     successor = BestNeighbor(chessboard, empty_loc, piece_list)
