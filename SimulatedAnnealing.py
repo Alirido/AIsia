@@ -17,7 +17,6 @@ class SimulatedAnnealing:
 
     def run(self):
         current = deepcopy(self.chessBoard)
-        current.printBoardInfo()
         while (self.T>0 and self.iteration<self.max_it):
             successor = deepcopy(current)
             piece = self.RandomPiece(successor)

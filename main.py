@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print('1. Hill-Climbing')
     print('2. Simulated Annealing')
     print('3. Genetic')
-    algo_choice = int(input('Algoritma mana yang ingin dipakai? '))
+    algo_choice = int(input('Masukkan nomor algoritma yang ingin dipakai: '))
     while algo_choice not in [1, 2, 3]:
         print()
         print('Input salah. Tolong ulangi.')
