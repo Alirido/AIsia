@@ -1,57 +1,52 @@
-import random
-import math
+import random, math, time
+from random import seed, randint
 from decimal import Decimal
 from datetime import datetime
 from copy import deepcopy
+from os import urandom
+from ChessBoard import ChessBoard
 
 class SimulatedAnnealing:
     # Constructor
     def __init__(self, chessBoard):
         self.chessBoard = chessBoard
-        self.T = 60*60      # Temperature
-        self.ch = 0.05     # Cooling Schedule
-        self.elapsedTime = 0
-        self.startTime = datetime.now()
+        self.iteration = 0
+        self.max_it = 10000
+        self.T = 100000 # Temperature
+        self.ch = 0.98 # Cooling Schedule
 
     def run(self):
-        self.chessBoard.randomizeBoard()
         current = deepcopy(self.chessBoard)
+        current.printBoardInfo()
+        while (self.T>0 and self.iteration<self.max_it):
+            successor = deepcopy(current)
+            piece = self.RandomPiece(successor)
+            successor._randomizePiecePosition(piece)
+            if (self.acceptsuccessor(current,successor)):
+                current = successor
+            self.T *= self.ch
+            self.iteration += 1
+        
+        self.chessBoard = deepcopy(current)
 
-        stop = Decimal('0.05')
-        if self.chessBoard.count_black_pieces == 0 or self.chessBoard.count_white_pieces == 0:
-            current_h = current.countSameHeuristic()
 
-            while self.T > stop:
-                if current_h == 0:
-                    break
-                self.chessBoard.randomizeBoard()
-                successor = deepcopy(self.chessBoard)
-                successor_h = successor.countSameHeuristic()
-                delta_h = successor_h - current_h
-                if (delta_h <= 0) or math.exp(delta_h / self.T) > random.uniform(0.0, 1.0):
-                    current = deepcopy(successor)
-                    current_h = successor_h
-                self.T -= self.ch
-                print(self.T)
+    def acceptsuccessor(self,current,successor):
+        delta_h = (successor.countDiffHeuristic() - successor.countSameHeuristic()) - (current.countDiffHeuristic() - current.countSameHeuristic())
+        if(delta_h>0):
+            return True
         else:
-            current_h = current.countDiffHeuristic() - current.countSameHeuristic()
-            while self.T > stop:
-                self.chessBoard.randomizeBoard()
-                successor = deepcopy(self.chessBoard)
-                successor_h = successor.countDiffHeuristic() - successor.countSameHeuristic()
-                delta_h = successor_h - current_h
-                if (delta_h <= 0) or math.exp(delta_h / self.T) > random.uniform(0,1):
-                    current = deepcopy(successor)
-                    current_h = successor_h
-                self.T -= self.ch
+            return (math.exp(delta_h / self.T) > random.uniform (0.0,1.0))
 
-        # current.printBoardInfo()
-        # self.elapsedTime = self.getElapsedTime()
-        # print("Success, Elapsed Time: %sms" % (str(self.elapsedTime)))
+    def RandomPiece(self,chessboard):
+        row = randint(0,7)
+        col = randint(0,7)
+        while(chessboard.board[row][col] == {}):
+            row = randint(0,7)
+            col = randint(0,7)
+        return chessboard.board[row][col]
 
-        return self.elapsedTime
+# if __name__ == '__main__':
 
-    def getElapsedTime(self):
-        endTime = datetime.now()
-        elapsedTime = (endTime - self.startTime).microseconds / 1000
-        return elapsedTime
+#     chess = ChessBoard('input3.txt')
+#     sa = SimulatedAnnealing(chess)
+#     sa.run()
